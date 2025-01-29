@@ -1,0 +1,56 @@
+set expandtab "spces instead of tabs
+set smarttab  "tab in the beggining of the line gives amount of spaces equals to shiftwidth
+set tabstop=4 "amount of spaces in one tab
+set softtabstop=4 "amount of spaces in tab in deletion
+set shiftwidth=4 "amount of sapces in >> <<
+set relativenumber
+syntax on
+colorscheme pablo
+set encoding=utf8
+
+set foldcolumn=0 "amount of spaces in left part line
+set noerrorbells "no sound in case of wrong keys
+set novisualbell
+set mouse=a
+set cursorline
+
+set signcolumn=number
+set modelines=0
+set numberwidth=1
+
+highlight CursorLineNr ctermfg=blue guifg=blue
+
+
+set splitright
+set splitbelow
+
+"copy and paste from sysytem buffer
+nnoremap <C-y> "+p
+vnoremap <C-y> "+y
+
+"stop highlighting 
+nnoremap <C-l> :noh<CR>
+
+
+set hlsearch "highlight all found words
+set incsearch "hilight beginning of words 
+set showmatch          " Show matching brackets.
+set showcmd            " Show (partial) command in status line.
+
+call plug#begin()
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+call plug#end()
+
+let g:airline#extensions#tabline#enabled = 1
+let g:airline_theme='base16_atelierforest'
+let g:airline#extensions#tabline#left_sep = ' '
+let g:airline#extensions#tabline#left_alt_sep = '|'
+let g:airline#extensions#tabline#formatter = 'unique_tail'
+let g:airline#extensions#tabline#tab_min_count = 2
+let g:airline#extensions#tabline#buffer_min_count = 2
+
+
+
+
