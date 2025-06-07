@@ -1,0 +1,189 @@
+set number
+set relativenumber
+set encoding=UTF-8
+set autoindent
+set cursorline
+set showmatch
+set mouse=a
+set lazyredraw
+"set signcolumn=number
+set signcolumn=yes
+set splitright
+set splitbelow
+syntax on
+filetype on
+"colorscheme pablo
+set expandtab                  " Заменяем табуляции на пробелы
+set tabstop=4                  " Количество пробелов для табуляции
+set shiftwidth=4               " Количество пробелов при автодобавлении отступов
+set softtabstop=4              " Количество пробелов при автотабуляции
+
+set smarttab                   " Умное поведение табуляции
+set smartindent                " Умное выравнивание для кода
+
+set updatetime=1000
+let mapleader = " "
+
+
+" Reduce delay for leader key
+set timeoutlen=150
+set ttimeoutlen=50
+
+highlight SignColumn ctermbg=NONE
+
+"copy and paste from system buffer
+nnoremap <C-y> "+p
+vnoremap <C-y> "+y
+
+"ctags
+set tags=./tags,tags;$HOME
+
+call plug#begin()
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'preservim/nerdtree'
+Plug 'Xuyuanp/nerdtree-git-plugin'
+Plug 'joshdick/onedark.vim'
+Plug 'liuchengxu/vista.vim'
+call plug#end()
+
+let g:onedark_hide_endofbuffer = 1
+let g:onedark_terminal_italics = 1
+let g:airline_theme='onedark'
+let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#tab_min_count = 2
+let g:airline#extensions#tabline#buffer_min_count = 2
+let g:airline_powerline_fonts = 0
+let g:airline_section_z = 'line %3l/%L col %2c'
+
+colorscheme onedark
+
+highlight CursorLineNr ctermfg=NONE ctermbg=NONE
+highlight CursorLine ctermfg=None ctermbg=NONE cterm=underline
+highlight LineNr ctermfg=87
+
+nmap gi :CocCommand git.chunkInfo<CR>
+nmap gud :CocCommand git.chunkUndo<CR>
+nmap gs :CocCommand git.chunkStage<CR>
+nmap gus :CocCommand git.chunkUnstage<CR>
+nmap gc :CocCommand git.showCommit<CR>
+
+highlight CocGitAddedSign     ctermbg=46  ctermfg=16 
+highlight CocGitChangedSign   ctermbg=27 ctermfg=16 
+highlight CocGitRemovedSign   ctermbg=196 ctermfg=16 
+
+let g:NERDTreeGitStatusIndicatorMapCustom = {
+                \ 'Modified'  :'✹',
+                \ 'Staged'    :'✚',
+                \ 'Untracked' :'✭',
+                \ 'Renamed'   :'➜',
+                \ 'Unmerged'  :'═',
+                \ 'Deleted'   :'✖',
+                \ 'Dirty'     :'✗',
+                \ 'Ignored'   :'☒',
+                \ 'Clean'     :'✔︎',
+                \ 'Unknown'   :'?',
+                \ }
+
+
+inoremap <leader>b <Esc>:NERDTreeToggle<cr>
+nnoremap <leader>b <Esc>:NERDTreeToggle<cr>
+let NERDTreeMapOpenInTab = '<C-t>'
+
+
+
+" Use <c-space> to trigger completion
+if has('nvim')
+  inoremap <silent><expr> <c-space> coc#refresh()
+else
+  inoremap <silent><expr> <c-@> coc#refresh()
+endif
+
+" Symbol renaming
+nmap <leader>rn <Plug>(coc-rename)
+nmap <leader>rf <Plug>(coc-refactor)
+
+" Use `[g` and `]g` to navigate diagnostics
+" Use `:CocDiagnostics` to get all diagnostics of current buffer in location list
+nmap <silent><nowait> [g <Plug>(coc-diagnostic-prev)
+nmap <silent><nowait> ]g <Plug>(coc-diagnostic-next)
+
+" GoTo code navigation
+nmap <silent><nowait> gd <Plug>(coc-definition)
+nmap <silent><nowait> gy <Plug>(coc-type-definition)
+nmap <silent><nowait> gr <Plug>(coc-references)
+
+nnoremap <silent> gh :CocCommand clangd.switchSourceHeader<CR>:tabnew %<CR>
+
+" Use K to show documentation in preview window
+nnoremap <silent> K :call ShowDocumentation()<CR>
+
+function! ShowDocumentation()
+  if CocAction('hasProvider', 'hover')
+    call CocActionAsync('doHover')
+  else
+    call feedkeys('K', 'in')
+  endif
+endfunction
+
+
+" Make <CR> to accept selected completion item or notify coc.nvim to format
+" <C-g>u breaks current undo, please make your own choice
+inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm()
+                              \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+
+
+" Highlight the symbol and its references when holding the cursor
+"autocmd CursorHold * silent call CocActionAsync('highlight')
+nnoremap <leader>h :call CocActionAsync('highlight')<CR>
+
+" Formatting selected code
+xmap <leader>f  <Plug>(coc-format-selected)
+nmap <leader>f  <Plug>(coc-format-selected)
+
+highlight CocHighlightText ctermbg=238 ctermfg=226 cterm=italic
+highlight CocHighlightRead ctermbg=237 ctermfg=226 cterm=italic
+highlight CocHighlightWrite ctermbg=237 ctermfg=226 cterm=italic
+
+let g:airline#extensions#hunks#coc_git = 1
+function! s:update_git_status()
+  let g:airline_section_b = "%{get(g:,'coc_git_status','')}"
+endfunction
+
+let g:airline_section_b = "%{get(g:,'coc_git_status','')}"
+
+autocmd User CocGitStatusChange call s:update_git_status()
+
+
+" vista.vim
+function! NearestMethodOrFunction() abort
+  return get(b:, 'vista_nearest_method_or_function', '')
+endfunction
+
+set statusline+=%{NearestMethodOrFunction()}
+
+" By default vista.vim never run if you don't call it explicitly.
+"
+" If you want to show the nearest function in your statusline automatically,
+" you can add the following line to your vimrc
+"autocmd VimEnter * call vista#RunForNearestMethodOrFunction()
+
+" Ensure you have installed some decent font to show these pretty symbols, then you can enable icon for the kind.
+let g:vista#renderer#enable_icon = 0
+
+nnoremap <silent> <leader>v :Vista!!<CR>
+
+let g:vista#executives = ['coc', 'ctags']
+"let g:vista_default_executive = 'coc'  " Use Coc.nvim as default
+
+" Set the executive for some filetypes explicitly. Use the explicit executive
+" instead of the default one for these filetypes when using `:Vista` without
+" specifying the executive.
+let g:vista_executive_for = {
+  \ 'cpp': 'ctags',
+  \ 'py': 'ctags',
+  \ }
+
+let g:vista_echo_cursor_strategy="floating_win"
+
